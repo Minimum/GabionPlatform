@@ -4,6 +4,6 @@ This is the current series of tools that power GS Lans.  This solution is also s
 
 # LanPlatform (aka GabionPlatform)
 
-There are two parts to LanPlatform: the API and the front-end website.  The API is the heart of the entire solution.  Without it, the operation cease to function.  Currently the API only controls local functionality.  In the future it will be expanded to control outside services such as game servers.
+There are two parts to LanPlatform: the API and the front-end website.  The API is the heart of the entire solution.  Without it, the operation cease to function.  Currently the API only controls local functionality.  In the future it will be expanded to control outside services such as game servers and IoT devices.
 
 The front-end website is the primary user interaction point for the Platform.  Currently under development, it will allow users to navigate all of the features of the Platform.  Admins will also be able to administate the entire platform from the website.  The front-end website is simply a SPA that interfaces with the API.
