@@ -1,0 +1,6 @@
+﻿Background
+	Inactive:	#949494
+	Active:		#6071A3
+
+Foreground
+	Primary:	#e6e6e6

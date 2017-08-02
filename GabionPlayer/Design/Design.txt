@@ -1,0 +1,6 @@
+﻿2 Columns
+	Left Column
+		Library - 200 songs per page view
+		Jukebox - 200 songs per page view
+		---
+		Playlists - Personal list of playlists

@@ -1,0 +1,23 @@
+﻿<ul class="breadcrumb" style="margin-left: 10px; margin-right: 10px">
+    <li><a href="#!/library">Library</a></li>
+    <li><a href="#!/library/loaners">Loaner Accounts</a></li>
+    <li class="active">{{Account.Username}}</li>
+</ul>
+
+<div style="margin-left: 10px">
+    <div>
+        <h2 style="margin-top: 0px;font-size:40px">
+            {{Account.Username}}
+        </h2>
+        <h4 ng-style="CheckoutStatusStyle">{{CheckoutStatusText}}</h4>
+    </div>
+
+    <h3>Game List</h3>
+    <table class="table table-striped table-hover">
+        <tbody>
+            <tr ng-repeat="game in GameList">
+                <td>{{game.Name}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="GabionAdmin.Interface.Pages.CommunityUsers"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="540" d:DesignWidth="960">
+
+    <Grid Background="#FF202020">
+        <DataGrid x:Name="UserTable" Margin="0,70,0,0" RowBackground="#FF202020" AlternatingRowBackground="#FF323232" BorderBrush="{x:Null}" Foreground="White" Style="{DynamicResource DefaultDataGrid}" ItemsSource="{Binding}" DataContext="Accounts" AutoGenerateColumns="False" CanUserResizeRows="False" CanUserAddRows="False" GridLinesVisibility="None" IsReadOnly="True" CanUserReorderColumns="False" RowHeight="20" SelectionMode="Single" MouseDoubleClick="UserTable_MouseDoubleClick">
+            <DataGrid.ContextMenu>
+                <ContextMenu >
+                    <MenuItem Header="Edit Account" Click="UserTable_Click"  />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Foreground" Value="#FFFFFFFF" />
+                    <Setter Property="Background" Value="#FF323232" />
+                    <Setter Property="SeparatorBrush" Value="#FF949494" />
+                    <Setter Property="Height" Value="26" />
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+            <DataGrid.RowHeaderStyle>
+                <Style TargetType="{x:Type DataGridRowHeader}">
+                    <Setter Property="Visibility" Value="Hidden"></Setter>
+                    <Setter Property="Width" Value="0"></Setter>
+                </Style>
+            </DataGrid.RowHeaderStyle>
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected"
+                        Value="True">
+                            <Setter Property="Background" Value="#FF255275"></Setter>
+                            <Setter Property="BorderThickness"
+                        Value="0" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected"
+                        Value="True">
+                            
+                            <Setter Property="BorderThickness"
+                        Value="0" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header=" Id" Binding="{Binding Id}" MinWidth="40" SortDirection="Ascending">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Margin" Value="2,0,0,0" />
+                            <Setter Property="Padding" Value="0,2,0,0" />
+                            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Margin" Value="2,0,0,0" />
+                            <Setter Property="Padding" Value="0,2,0,0" />
+                            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="ForwardPageButton" Content="&gt;" HorizontalAlignment="Right" Margin="0,45,10,0" VerticalAlignment="Top" Style="{DynamicResource DefaultButton}" Width="20"/>
+        <Button x:Name="BackPageButton" Content="&lt;" HorizontalAlignment="Right" Margin="0,45,120,0" VerticalAlignment="Top" Style="{DynamicResource DefaultButton}" Width="20"/>
+        <Label x:Name="PageNumberText" Content="1 of 5" HorizontalAlignment="Right" Margin="0,45,35,0" VerticalAlignment="Top" Foreground="White" Height="20" Width="80" VerticalContentAlignment="Center" Padding="5,0" HorizontalContentAlignment="Center"/>
+        <Button Content="Create" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="75" Style="{DynamicResource DefaultButton}"/>
+        <Label Content="Account Tools" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <TextBox x:Name="SearchBox" HorizontalAlignment="Right" Height="22" Margin="0,10,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Style="{DynamicResource DefaultTextBox}" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp"/>
+        <Label x:Name="SearchTip" Content="Search" HorizontalAlignment="Right" Margin="0,10,164,0" VerticalAlignment="Top" Height="22" Foreground="#FFB4B4B4" Padding="5,0" VerticalContentAlignment="Center" IsHitTestVisible="False"/>
+    </Grid>
+</UserControl>

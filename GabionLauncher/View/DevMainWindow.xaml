@@ -1,0 +1,23 @@
+﻿<Window x:Class="GabionLauncher.View.DevMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="GLauncher Developer Mode" Height="720" Width="1280" Background="#FF202020" Foreground="White">
+    <Grid>
+        <Menu Height="24" VerticalAlignment="Top" Style="{DynamicResource DarkMenu}">
+            <MenuItem Header="File" Height="24" Style="{DynamicResource DarkMenuItem}">
+                <MenuItem Header="New" HorizontalAlignment="Left" Width="140"/>
+                <MenuItem Header="Open..." HorizontalAlignment="Left" Width="140"/>
+                <MenuItem Header="Save" HorizontalAlignment="Left" Width="140"/>
+                <MenuItem Header="Save As..."/>
+                <Separator Style="{DynamicResource DarkSeparator}"/>
+                <MenuItem Header="Exit"/>
+            </MenuItem>
+            <MenuItem Header="Library" Height="24" Style="{DynamicResource DarkMenuItem}">
+                <MenuItem Header="Create App..." HorizontalAlignment="Left" Width="180"/>
+            </MenuItem>
+        </Menu>
+        <ListBox HorizontalAlignment="Left" Margin="2,47,0,40" Width="200" Style="{DynamicResource DarkListBox}" BorderBrush="{DynamicResource DarkUi.Background}" Foreground="White"/>
+        <TextBox HorizontalAlignment="Left" Height="24" Margin="2,24,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="200" Style="{DynamicResource DarkTextBox}" BorderBrush="{DynamicResource DarkUi.Border}"/>
+
+    </Grid>
+</Window>

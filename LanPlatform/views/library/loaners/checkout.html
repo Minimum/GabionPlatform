@@ -1,0 +1,19 @@
+﻿<div class="modal-header">
+    <button type="button" ng-click="Cancel()" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 class="modal-title" id="modal-title">Loaner Checkout</h3>
+</div>
+
+<div class="modal-body" id="modal-body">
+    <div ng-show="RequestStatus == 0">
+
+    </div>
+
+    <div ng-show="RequestStatus == 1">
+        
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="Ok()" ng-show="RequestStatus == 1">Finish</button>
+    <button class="btn btn-default" type="button" ng-click="Cancel()" ng-show="RequestStatus == 0">Cancel</button>
+</div>

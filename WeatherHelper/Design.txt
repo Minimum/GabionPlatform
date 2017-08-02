@@ -1,0 +1,12 @@
+﻿Wunderground API Limits
+	500 Calls per day
+	10 Calls per minute
+
+Call Scheduling
+	CALL TYPE					INTERVAL
+	Current Conditions			15 Minutes	(96 per day)
+	Current Radar				30 Minutes	(48 per day)
+	Hourly Forecast				60 Minutes (24 per day)
+	Current Alerts				60 Minutes (24 per day)
+	3 Day Forecast				24 Hours (1 per day)
+								Total:	193 / 500 per day
