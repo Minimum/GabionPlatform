@@ -25,6 +25,7 @@ namespace GabionPlatform.Accounts
         public const String FlagEditAccountAdvanced = "AccountEditAdvanced";
         public const String FlagEditUsername = "AccountAuthUsernameEdit";
         public const String FlagEditSession = "AccountAuthSessionEdit";
+        public const String FlagEditRoles = "AccountEditRoles";
 
         // Settings
         public const String SettingAllowRegister = "AccountAllowRegister";
@@ -200,6 +201,11 @@ namespace GabionPlatform.Accounts
         public AuthSession GetSession(long id)
         {
             return Context.AuthSession.SingleOrDefault(s => s.Id == id);
+        }
+
+        public List<AuthSession> GetSessions(UserAccount account)
+        {
+            return Context.AuthSession.Where(s => s.Account == account.Id).ToList();
         }
 
         public AuthSession CreateSession(UserAccount account)
@@ -505,6 +511,16 @@ namespace GabionPlatform.Accounts
          * User Access
          */
 
+        public bool CheckAccess(String flag)
+        {
+            return LocalAccount != null && CheckAccess(LocalAccount, flag);
+        }
+
+        public bool CheckAccess(String flag, String scope)
+        {
+            return LocalAccount != null && CheckAccess(LocalAccount, flag, scope);
+        }
+
         public bool CheckAccess(UserAccount account, String flag, String scope)
         {
             return CheckAccess(account, flag, scope, true);
@@ -548,6 +564,16 @@ namespace GabionPlatform.Accounts
             return success;
         }
 
+        public void AddRole(UserRole role)
+        {
+            if (role.Id == 0)
+            {
+                Context.Role.Add(role);
+            }
+
+            return;
+        }
+
         public List<UserRole> GetRolesByAccount(UserAccount account)
         {
             return GetRolesByAccount(account.Id);
@@ -566,6 +592,35 @@ namespace GabionPlatform.Accounts
         public UserRole GetRoleByName(String name)
         {
             return Context.Role.FirstOrDefault(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public List<UserPermission> GetRolePermissions(long id)
+        {
+            return Context.RoleFlag.Where(s => s.Role == id).ToList();
+        }
+
+        public UserPermission GetPermission(long roleId, String flag, String scope)
+        {
+            return Context.RoleFlag.FirstOrDefault(s => s.Role == roleId &&
+                                                        s.Flag.Equals(flag, StringComparison.OrdinalIgnoreCase) &&
+                                                        s.Scope.Equals(scope, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void AddPermission(UserPermission permission)
+        {
+            if (permission.Id == 0)
+            {
+                Context.RoleFlag.Add(permission);
+            }
+
+            return;
+        }
+
+        public void RemovePermission(UserPermission permission)
+        {
+            Context.RoleFlag.Remove(permission);
+
+            return;
         }
 
         public List<UserPermission> GetAllAccountFlags(UserAccount account)

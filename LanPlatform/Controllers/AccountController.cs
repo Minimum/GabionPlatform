@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Web;
 using System.Web.Http;
 using GabionPlatform.Accounts;
@@ -15,7 +13,6 @@ using GabionPlatform.Models.Requests;
 using GabionPlatform.Models.Responses;
 using GabionPlatform.Network;
 using GabionPlatform.Network.Messages;
-using Newtonsoft.Json;
 
 namespace GabionPlatform.Controllers
 {
@@ -36,7 +33,7 @@ namespace GabionPlatform.Controllers
 
                 if (account != null)
                 {
-                    instance.Data = new UserAccountDto(account);
+                    instance.SetData(new UserAccountDto(account), "UserAccount");
                 }
                 else
                 {
@@ -62,7 +59,7 @@ namespace GabionPlatform.Controllers
 
             if (account != null)
             {
-                instance.Data = new UserAccountDto(account);
+                instance.SetData(new UserAccountDto(account), "UserAccount");
             }
             else
             {
@@ -224,6 +221,10 @@ namespace GabionPlatform.Controllers
                                 targetAccount.LastEvent = userAccount.LastEvent;
                             }
                         }
+
+                        instance.Context.SaveChanges();
+
+                        instance.SetData(new UserAccountDto(targetAccount), "UserAccount");
                     }
                     else
                     {
@@ -283,13 +284,45 @@ namespace GabionPlatform.Controllers
 
                 instance.Context.SaveChanges();
 
-                instance.Data = new UserAccountDto(account);
+                instance.SetData(new UserAccountDto(account), "UserAccount");
             }
             else
             {
                 instance.Status = AppResponseStatus.ResponseError;
 
                 instance.StatusCode = "ACCESS_DENIED";
+            }
+
+            return instance.ToResponse();
+        }
+
+        [HttpGet]
+        [Route("browse")]
+        public HttpResponseMessage BrowseAccounts([FromUri] SearchAccountRequest request)
+        {
+            AppInstance instance = new AppInstance(Request, HttpContext.Current);
+
+            request.SanityCheck();
+
+            List<UserAccount> dataAccounts = instance.Accounts.GetAccountSearch(request);
+
+            if (dataAccounts != null)
+            {
+                BrowseResult<UserAccountDto> accounts = new BrowseResult<UserAccountDto>();
+
+                accounts.TotalResults = instance.Accounts.GetAccountTotal();
+
+                foreach (UserAccount account in dataAccounts)
+                {
+                    accounts.Results.Add(new UserAccountDto(account));
+                }
+
+                instance.SetData(accounts, "UserAccountList");
+            }
+            else
+            {
+                instance.Status = AppResponseStatus.AppError;
+                instance.StatusCode = "DAO_ERROR";
             }
 
             return instance.ToResponse();
@@ -303,7 +336,7 @@ namespace GabionPlatform.Controllers
 
             if (instance.LocalAccount != null)
             {
-                instance.Data = new UserAccountDto(instance.LocalAccount);
+                instance.SetData(new UserAccountDto(instance.LocalAccount), "UserAccount");
             }
             else
             {
@@ -315,9 +348,9 @@ namespace GabionPlatform.Controllers
             return instance.ToResponse();
         }
 
-        [HttpPost]
+        [HttpPost] 
         [Route("account/{id}/avatar")]
-        public HttpResponseMessage PostAvatar(long id)
+        public HttpResponseMessage SetAvatar(long id)
         {
             AppInstance instance = new AppInstance(Request, HttpContext.Current);
             ContentManager contentManager = new ContentManager(instance);
@@ -335,6 +368,8 @@ namespace GabionPlatform.Controllers
                         account.Avatar = id;
 
                         NetMessageManager.AddMessageBroadcastQuick(instance, new ChangeAvatarMessage(account));
+
+                        instance.SetData(true, "bool");
                     }
                     else
                     {
@@ -368,7 +403,7 @@ namespace GabionPlatform.Controllers
             if (id > 0)
             {
                 // Check if user has access
-                if (localAccount != null && instance.Accounts.CheckAccess(localAccount, AccountManager.FlagEditUsername))
+                if (localAccount != null && (localAccount.Id == id || instance.Accounts.CheckAccess(localAccount, AccountManager.FlagEditUsername)))
                 {
                     UserAccount targetAccount = instance.Accounts.GetAccountReadOnly(id);
 
@@ -379,15 +414,15 @@ namespace GabionPlatform.Controllers
                         if (!targetAccount.Root || targetAccount.Id == localAccount.Id)
                         {
                             List<AuthUsername> usernames = instance.Accounts.GetUsernames(targetAccount);
-                            List<AuthUsernameModel> usernameModels = new List<AuthUsernameModel>();
+                            List<AuthUsernameDto> usernameModels = new List<AuthUsernameDto>();
 
                             // Convert usernames to specified username model to protect hashed passwords
                             foreach (AuthUsername username in usernames)
                             {
-                                usernameModels.Add(new AuthUsernameModel(username));
+                                usernameModels.Add(new AuthUsernameDto(username));
                             }
 
-                            instance.Data = usernameModels;
+                            instance.SetData(usernameModels, "AuthUsernameList");
                         }
                         else
                         {
@@ -440,9 +475,11 @@ namespace GabionPlatform.Controllers
                             // Check if username already exists
                             if (instance.Accounts.GetUsername(request.Username) == null)
                             {
-                                instance.Accounts.CreateUsername(id, request.Username, request.Password);
+                                AuthUsername username = instance.Accounts.CreateUsername(id, request.Username, request.Password);
 
-                                instance.Data = true;
+                                instance.Context.SaveChanges();
+
+                                instance.SetData(new AuthUsernameDto(username), "AuthUsername");
                             }
                             else
                             {
@@ -477,6 +514,27 @@ namespace GabionPlatform.Controllers
             return instance.ToResponse();
         }
 
+        [HttpPost]
+        [Route("account/{id}/auth/user/{authId}")]
+        public HttpResponseMessage EditUsername(long id, long authId, [FromBody] AuthUsernameDto username)
+        {
+            AppInstance instance = new AppInstance(Request, HttpContext.Current);
+            UserAccount localAccount = instance.LocalAccount;
+
+            // Check if request is valid
+            if (id > 0 && username.Username.Length > 0 && username.Password.Length > 0)
+            {
+                // Check user's access
+                if (localAccount != null && instance.Accounts.CheckAccess(localAccount, AccountManager.FlagEditUsername))
+                {
+                    UserAccount targetAccount = instance.Accounts.GetAccount(id);
+                }
+
+            }
+
+            return instance.ToResponse();
+        }
+
         [HttpDelete]
         [Route("account/{id}/auth/user/{authId}")]
         public HttpResponseMessage DeleteUsername(long id, long authId)
@@ -499,7 +557,7 @@ namespace GabionPlatform.Controllers
             if (id > 0)
             {
                 // Check if user has access
-                if (localAccount != null && instance.Accounts.CheckAccess(localAccount, AccountManager.FlagEditUsername))
+                if (localAccount != null && (localAccount.Id == id || instance.Accounts.CheckAccess(localAccount, AccountManager.FlagEditSession)))
                 {
                     UserAccount targetAccount = instance.Accounts.GetAccountReadOnly(id);
 
@@ -509,16 +567,15 @@ namespace GabionPlatform.Controllers
                         // Check if target is protected
                         if (!targetAccount.Root || targetAccount.Id == localAccount.Id)
                         {
-                            List<AuthUsername> usernames = instance.Accounts.GetUsernames(targetAccount);
-                            List<AuthUsernameModel> usernameModels = new List<AuthUsernameModel>();
+                            List<AuthSession> sessions = instance.Accounts.GetSessions(targetAccount);
+                            List<AuthSessionDto> sessionModels = new List<AuthSessionDto>();
 
-                            // Convert usernames to specified username model to protect hashed passwords
-                            foreach (AuthUsername username in usernames)
+                            foreach (AuthSession session in sessions)
                             {
-                                usernameModels.Add(new AuthUsernameModel(username));
+                                sessionModels.Add(new AuthSessionDto(session));
                             }
 
-                            instance.Data = usernameModels;
+                            instance.SetData(sessionModels, "AuthSessionList");
                         }
                         else
                         {
@@ -564,9 +621,8 @@ namespace GabionPlatform.Controllers
         [Route("logout")]
         public HttpResponseMessage Logout()
         {
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
             AppInstance instance = new AppInstance(Request, HttpContext.Current);
-
+            
             if (instance.LocalAccount != null)
             {
                 HttpCookie sessionId = HttpContext.Current.Request.Cookies["LPSessionId"];
@@ -579,12 +635,11 @@ namespace GabionPlatform.Controllers
                 sessionIdCookie.Expires = DateTimeOffset.Now.AddDays(-1d);
                 sessionKeyCookie.Expires = DateTimeOffset.Now.AddDays(-1d);
 
-                response.Headers.AddCookies(new CookieHeaderValue[] { sessionIdCookie, sessionKeyCookie });
+                instance.Cookies.Add(sessionIdCookie);
+                instance.Cookies.Add(sessionKeyCookie);
             }
 
-            response.Content = new StringContent(JsonConvert.SerializeObject(instance), Encoding.UTF8, "application/json");
-
-            return response;
+            return instance.ToResponse();
         }
 
         [HttpPost]
@@ -610,7 +665,7 @@ namespace GabionPlatform.Controllers
 
                 // TODO: Log successful attempt
 
-                instance.Data = localAccount;
+                instance.SetData(new UserAccountDto(localAccount), "UserAccount");
             }
             else
             {
@@ -625,38 +680,6 @@ namespace GabionPlatform.Controllers
         }
 
         [HttpGet]
-        [Route("browse")]
-        public HttpResponseMessage BrowseAccounts([FromUri] SearchAccountRequest request)
-        {
-            AppInstance instance = new AppInstance(Request, HttpContext.Current);
-
-            request.SanityCheck();
-
-            List<UserAccount> dataAccounts = instance.Accounts.GetAccountSearch(request);
-
-            if (dataAccounts != null)
-            {
-                BrowseResult<UserAccountDto> accounts = new BrowseResult<UserAccountDto>();
-
-                accounts.TotalResults = instance.Accounts.GetAccountTotal();
-
-                foreach (UserAccount account in dataAccounts)
-                {
-                    accounts.Results.Add(new UserAccountDto(account));
-                }
-
-                instance.Data = accounts;
-            }
-            else
-            {
-                instance.Status = AppResponseStatus.AppError;
-                instance.StatusCode = "DAO_ERROR";
-            }
-
-            return instance.ToResponse();
-        }
-
-        [HttpGet]
         [Route("local/access/{scope}/{flag}")]
         public HttpResponseMessage CheckLocalAccess(String flag, String scope)
         {
@@ -665,7 +688,186 @@ namespace GabionPlatform.Controllers
 
             if (localAccount != null)
             {
-                instance.Data = instance.Accounts.CheckAccess(localAccount, flag, scope, false);
+                instance.SetData(instance.Accounts.CheckAccess(localAccount, flag, scope, false), "bool");
+            }
+
+            return instance.ToResponse();
+        }
+
+        // Roles/Access
+
+        [HttpGet]
+        [Route("role/{id}")]
+        public HttpResponseMessage GetRole(long id)
+        {
+            AppInstance instance = new AppInstance(Request, HttpContext.Current);
+            UserRole role = instance.Accounts.GetRoleById(id);
+
+            if (role != null)
+            {
+                instance.SetData(new UserRoleDto(role), "UserRole");
+            }
+            else
+            {
+                instance.SetError("INVALID_ROLE");
+            }
+
+            return instance.ToResponse();
+        }
+
+        [HttpPost]
+        [Route("role/{id}")]
+        public HttpResponseMessage EditRole(long id, [FromBody] UserRoleDto roleEdit)
+        {
+            AppInstance instance = new AppInstance(Request, HttpContext.Current);
+
+            if (instance.Accounts.CheckAccess(AccountManager.FlagEditRoles))
+            {
+                UserRole role = instance.Accounts.GetRoleById(id);
+
+                if (role != null)
+                {
+                    role.Name = roleEdit.Name;
+
+                    instance.Context.SaveChanges();
+
+                    instance.SetData(new UserRoleDto(role), "UserRole");
+                }
+                else
+                {
+                    instance.SetError("INVALID_ROLE");
+                }
+            }
+            else
+            {
+                instance.SetError("ACCESS_DENIED");
+            }
+
+            return instance.ToResponse();
+        }
+
+        [HttpPut]
+        [Route("role")]
+        public HttpResponseMessage CreateRole([FromBody] UserRoleDto role)
+        {
+            AppInstance instance = new AppInstance(Request, HttpContext.Current);
+
+            if (instance.Accounts.CheckAccess(AccountManager.FlagEditRoles))
+            {
+                UserRole newRole = new UserRole();
+
+                newRole.Name = role.Name;
+
+                instance.Accounts.AddRole(newRole);
+
+                instance.Context.SaveChanges();
+
+                instance.SetData(new UserRoleDto(newRole), "UserRole");
+
+                // TODO: Log
+            }
+            else
+            {
+                instance.SetError("ACCESS_DENIED");
+            }
+
+            return instance.ToResponse();
+        }
+
+        [HttpGet]
+        [Route("role/{id}/permission")]
+        public HttpResponseMessage GetRolePermissions(long id)
+        {
+            AppInstance instance = new AppInstance(Request, HttpContext.Current);
+
+            if (instance.LocalAccount != null)
+            {
+                List<UserPermission> permissions = instance.Accounts.GetRolePermissions(id);
+
+                instance.SetData(UserPermissionDto.ConvertList(permissions), "UserPermissionList");
+            }
+            else
+            {
+                instance.SetError("ACCESS_DENIED");
+            }
+
+            return instance.ToResponse();
+        }
+
+        [HttpPut]
+        [Route("role/{id}/permission")]
+        public HttpResponseMessage AddRolePermission(long id, [FromBody] UserPermissionDto permission)
+        {
+            AppInstance instance = new AppInstance(Request, HttpContext.Current);
+
+            if (instance.Accounts.CheckAccess(AccountManager.FlagEditRoles))
+            {
+                if (permission.Flag.Length > 0 && permission.Scope.Length > 0)
+                {
+                    UserRole role = instance.Accounts.GetRoleById(id);
+
+                    if (role != null)
+                    {
+                        UserPermission newPermission = instance.Accounts.GetPermission(id, permission.Flag,
+                            permission.Scope);
+
+                        if (newPermission == null)
+                        {
+                            newPermission = new UserPermission();
+
+                            newPermission.Role = id;
+                            newPermission.Flag = permission.Flag;
+                            newPermission.Scope = permission.Scope;
+
+                            instance.Accounts.AddPermission(newPermission);
+
+                            instance.Context.SaveChanges();
+                        }
+
+                        instance.SetData(new UserPermissionDto(newPermission), "UserPermission");
+                    }
+                    else
+                    {
+                        instance.SetError("INVALID_ROLE");
+                    }
+                }
+                else
+                {
+                    instance.SetError("INVALID_PERMISSION");
+                }
+            }
+            else
+            {
+                instance.SetError("ACCESS_DENIED");
+            }
+
+            return instance.ToResponse();
+        }
+
+        [HttpDelete]
+        [Route("role/{id}/permission")]
+        public HttpResponseMessage DeleteRolePermission(long id, [FromBody] UserPermissionDto permission)
+        {
+            AppInstance instance = new AppInstance(Request, HttpContext.Current);
+
+            if (instance.Accounts.CheckAccess(AccountManager.FlagEditRoles))
+            {
+                UserPermission target = instance.Accounts.GetPermission(id, permission.Flag, permission.Scope);
+
+                if (target != null)
+                {
+                    instance.Accounts.RemovePermission(target);
+
+                    instance.Data = true;
+                }
+                else
+                {
+                    instance.SetError("INVALID_PERMISSION");
+                }
+            }
+            else
+            {
+                instance.SetError("ACCESS_DENIED");
             }
 
             return instance.ToResponse();

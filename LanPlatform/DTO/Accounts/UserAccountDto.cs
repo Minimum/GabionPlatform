@@ -4,12 +4,8 @@ using GabionPlatform.Accounts;
 
 namespace GabionPlatform.DTO.Accounts
 {
-    public class UserAccountDto
+    public class UserAccountDto : EditableGabionDto
     {
-        // Database Variables
-        public long Id { get; set; }
-        public long Version { get; set; }
-
         // Access
         public bool Root { get; set; }
         public UserAccountType AccountType { get; set; }     // Advanced Edit
@@ -43,9 +39,6 @@ namespace GabionPlatform.DTO.Accounts
 
         public UserAccountDto()
         {
-            Id = 0;
-            Version = 0;
-            
             Root = false;
             AccountType = UserAccountType.Player;
 
@@ -75,10 +68,8 @@ namespace GabionPlatform.DTO.Accounts
         }
 
         public UserAccountDto(UserAccount account)
+            : base(account)
         {
-            Id = account.Id;
-            Version = account.Version;
-
             Root = account.Root;
             AccountType = account.AccountType;
 
@@ -107,7 +98,7 @@ namespace GabionPlatform.DTO.Accounts
             AwardsXp = account.AwardsXp;
         }
 
-        public static List<UserAccountDto> ConvertList(List<UserAccount> accounts)
+        public static List<UserAccountDto> ConvertList(ICollection<UserAccount> accounts)
         {
             List<UserAccountDto> models = new List<UserAccountDto>();
 

@@ -25,9 +25,9 @@ LPAccounts.OnLocalAccountChange = new LPEvents.EventHandler();
 LPAccounts.OnPermissionsChange = new LPEvents.EventHandler();
 
 LPAccounts.Initialize = function (data) {
-    if (data.Data.LocalAccount != null) {
+    if (data.Data.LocalUserAccount != null) {
         // Authenticate
-        LPAccounts.Auth(data.Data.LocalAccount);
+        LPAccounts.Auth(data.Data.LocalUserAccount);
 
         // Set permissions
         LPAccounts.SetLocalPermissions(data.Data.LocalPermissions);
@@ -92,7 +92,7 @@ LPAccounts.Auth = function (model) {
     LPAccounts.LocalAccount = account;
     LPAccounts.AddAccount(account);
 
-    LPAccounts.OnLocalAccountChange.Invoke(this, this.LocalAccount);
+    LPAccounts.OnLocalAccountChange.Invoke(LPAccounts, LPAccounts.LocalAccount);
 
     return;
 }

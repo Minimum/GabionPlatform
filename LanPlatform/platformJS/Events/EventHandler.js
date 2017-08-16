@@ -1,20 +1,17 @@
 ﻿LPEvents.EventHandler = function() {
     this.Hooks = [];
-    this.NewHookId = 0;
 }
 
 LPEvents.EventHandler.prototype.AddHook = function (callback) {
-    var hook = new LPEvents.EventHook(this, this.NewHookId, callback);
+    var hook = new LPEvents.EventHook(this, callback);
 
-    this.Hooks[this.NewHookId] = hook;
-
-    this.NewHookId++;
+    this.Hooks.push(hook);
     
     return hook;
 }
 
-LPEvents.EventHandler.prototype.RemoveHook = function(hook) {
-    this.Hooks[hook.HandleId] = null;
+LPEvents.EventHandler.prototype.RemoveHook = function (hook) {
+    this.Hooks.splice(this.Hooks.indexOf(hook), 1);
 
     return;
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using GabionPlatform.Content;
+using GabionPlatform.DTO.Content;
 using GabionPlatform.Engine;
 using GabionPlatform.Models;
 using Newtonsoft.Json;
@@ -29,7 +30,7 @@ namespace GabionPlatform.Controllers
                 {
                     if (contentManager.CheckAccess(item, instance.LocalAccount))
                     {
-                        instance.Data = new ContentItemModel(item);
+                        instance.Data = new ContentItemDto(item);
                     }
                     else
                     {

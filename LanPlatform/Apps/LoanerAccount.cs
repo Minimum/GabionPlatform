@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using GabionPlatform.Database;
 using Newtonsoft.Json;
 
@@ -17,7 +18,7 @@ namespace GabionPlatform.Apps
         public long CheckoutChallenge { get; set; }
 
         [NotMapped]
-        public List<LoanerApp> Apps { get; set; } 
+        public List<App> Apps { get; set; } 
 
         public LoanerAccount()
         {
@@ -27,7 +28,7 @@ namespace GabionPlatform.Apps
             CheckoutUser = 0;
             CheckoutChallenge = 1;
 
-            Apps = new List<LoanerApp>();
+            Apps = new List<App>();
         }
     }
 }

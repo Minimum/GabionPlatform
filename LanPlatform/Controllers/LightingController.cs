@@ -25,7 +25,7 @@ namespace GabionPlatform.Controllers
         }
 
         [HttpGet]
-        [Route("light/view/{id}")]
+        [Route("light/{id}")]
         public HttpResponseMessage GetLight(long id)
         {
             AppInstance appResponse = new AppInstance(Request, HttpContext.Current);
@@ -36,7 +36,7 @@ namespace GabionPlatform.Controllers
         }
 
         [HttpGet]
-        [Route("group/view/{id}")]
+        [Route("group/{id}")]
         public HttpResponseMessage GetGroup(long id)
         {
             AppInstance appResponse = new AppInstance(Request, HttpContext.Current);
@@ -47,7 +47,7 @@ namespace GabionPlatform.Controllers
         }
 
         [HttpPost]
-        [Route("light/brightness/{id}")]
+        [Route("light/{id}/brightness")]
         public HttpResponseMessage SetLightBrightness(long id, [FromBody] SetLightBrightnessRequest request)
         {
             AppInstance appResponse = new AppInstance(Request, HttpContext.Current);
@@ -58,7 +58,7 @@ namespace GabionPlatform.Controllers
         }
 
         [HttpPost]
-        [Route("group/brightness/{id}")]
+        [Route("group/{id}/brightness")]
         public HttpResponseMessage SetGroupBrightness(long id, [FromBody] SetLightBrightnessRequest request)
         {
             AppInstance appResponse = new AppInstance(Request, HttpContext.Current);

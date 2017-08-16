@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Web;
+using System.Web.Http;
 using GabionPlatform.Accounts;
 using GabionPlatform.DAL;
 using GabionPlatform.Settings;
@@ -138,6 +139,22 @@ namespace GabionPlatform.Models
             cookie.Path = "/";
 
             Cookies.Add(cookie);
+
+            return;
+        }
+
+        public void SetError(String errorCode)
+        {
+            Status = AppResponseStatus.ResponseError;
+            StatusCode = errorCode;
+
+            return;
+        }
+
+        public void SetError(AppResponseStatus statusType, String errorCode)
+        {
+            Status = statusType;
+            StatusCode = errorCode;
 
             return;
         }

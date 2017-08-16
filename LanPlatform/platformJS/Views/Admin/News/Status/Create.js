@@ -61,10 +61,10 @@
         var contentModel = {};
 
         switch ($scope.RequestStatus) {
-        case 1:
-        {
-            contentModel.AppId = $scope.FormAppId;
-        }
+            case 1:
+            {
+                contentModel.AppId = $scope.FormAppId;
+            }
         }
 
         statusModel.Content = JSON.stringify(contentModel);

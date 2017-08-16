@@ -1,24 +1,24 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace GabionPlatform.Database
 {
     public abstract class EditableDatabaseObject : DatabaseObject
     {
-        [JsonIgnore]
         [Timestamp]
         public byte[] RowVersion { get; set; }
 
         [NotMapped]
-        public long Version
+        public UInt64 Version
         {
             get
             {
                 if (RowVersion != null)
                 {
-                    return BitConverter.ToInt64(RowVersion, 0);
+                    return BitConverter.ToUInt64(RowVersion.Reverse().ToArray(), 0);
                 }
                 else
                 {
@@ -26,7 +26,7 @@ namespace GabionPlatform.Database
                 }
             }
 
-            set { RowVersion = BitConverter.GetBytes(value); }
+            set { RowVersion = BitConverter.GetBytes(value).Reverse().ToArray(); }
         }
 
         public EditableDatabaseObject()

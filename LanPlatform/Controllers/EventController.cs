@@ -9,12 +9,12 @@ using Newtonsoft.Json;
 
 namespace GabionPlatform.Controllers
 {
-    [RoutePrefix("api/event")]
+    [RoutePrefix("api/events")]
     public class EventController : ApiController
     {
         [HttpGet]
-        [Route("info/{id}")]
-        public HttpResponseMessage GetInfo(long id)
+        [Route("event/{id}")]
+        public HttpResponseMessage GetEvent(long id)
         {
             AppInstance instance = new AppInstance(Request, HttpContext.Current);
             LanEventManager events = new LanEventManager(instance);
@@ -29,5 +29,13 @@ namespace GabionPlatform.Controllers
 
             return instance.ToResponse();
         }
+
+        // CreateEvent
+
+        // DeleteEvent
+
+        // CreateEventGuest
+
+        // DeleteEventGuest
     }
 }

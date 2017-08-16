@@ -10,7 +10,6 @@
         <tr>
             <th>Username</th>
             <th>Password</th>
-            <th>Steam Code</th>
             <th>Status</th>
             <th></th>
         </tr>
@@ -19,15 +18,11 @@
         <tr ng-repeat="account in Accounts">
             <td>
                 <i class="fa fa-ticket" style="margin-right:4px" aria-hidden="true"></i>
-                <a ng-href="#!library/loaner/{{account.Id}}" style="text-decoration: none">{{account.Username}}</a>
+                <a ng-href="#!/library/loaner/{{account.Id}}" style="text-decoration: none">{{account.Username}}</a>
             </td>
             <td>
                 <span ng-hide="account.ShowPassword()">*****</span>
                 <span ng-show="account.ShowPassword()">{{account.Password}}</span>
-            </td>
-            <td>
-                <span ng-hide="account.ShowPassword()">*****</span>
-                <span ng-show="account.ShowPassword()">{{account.SteamCode}}</span>
             </td>
             <td>
                 <span ng-show="account.CheckoutUser == 0" class="text-success">Available for checkout</span>
@@ -35,9 +30,9 @@
                 <span ng-show="account.CheckoutUser != 0 && ShowCheckin(account)" class="text-warning">Checked out by you</span>
             </td>
             <td style="text-align:right">
-                <a ng-click="Checkout(account)" class="btn btn-success btn-xs" ng-show="account.CheckoutUser == 0">Check out</a>
-                <a ng-click="Checkin(account)" class="btn btn-warning btn-xs" ng-show="account.CheckoutUser != 0 && ShowCheckin(account)">Check in</a>
-                <a ng-click="Checkin(account)" class="btn btn-warning btn-xs" ng-show="account.CheckoutUser != 0 && !ShowCheckin(account)">Force check in</a>
+                <a ng-click="Checkout(account)" class="btn btn-success btn-xs" ng-show="ShowCheckout(account)">Check out</a>
+                <a ng-click="Checkin(account)" class="btn btn-warning btn-xs" ng-show="ShowCheckin(account)">Check in</a>
+                <a ng-click="Checkin(account)" class="btn btn-warning btn-xs" ng-show="ShowForceCheckin(account)">Force check in</a>
             </td>
         </tr>
     </tbody>        

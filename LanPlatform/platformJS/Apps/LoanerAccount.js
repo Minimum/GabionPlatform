@@ -4,7 +4,6 @@
 
     this.Username = "";
     this.Password = "";
-    this.SteamCode = "";
     this.CheckoutUser = 0;
     
     this.Apps = [];
@@ -21,11 +20,21 @@ LPApps.LoanerAccount.prototype.LoadModel = function (model) {
 
     this.Username = model.Username;
     this.Password = model.Password;
-    this.SteamCode = model.SteamCode;
     this.CheckoutUser = model.CheckoutUser;
 
-    this.Apps = model.Apps;
     this.AppCount = model.Apps.length;
+
+    for (var x = 0; x < this.AppCount; x++) {
+        var app = new LPApps.App();
+
+        app.LoadModel(model.Apps[x]);
+
+        app = LPApps.AddApp(app);
+
+        this.Apps[x] = app;
+    }
+
+    return;
 }
 
 LPApps.LoanerAccount.prototype.Update = function (loaner) {
@@ -33,7 +42,6 @@ LPApps.LoanerAccount.prototype.Update = function (loaner) {
 
     this.Username = model.Username;
     this.Password = model.Password;
-    this.SteamCode = model.SteamCode;
     this.CheckoutUser = model.CheckoutUser;
 
     for (var x = 0; x < loaner.AppCount; x++) {
@@ -50,6 +58,18 @@ LPApps.LoanerAccount.prototype.AddApp = function (app) {
         this.AppCount++;
     }
     
+    return;
+}
+
+LPApps.LoanerAccount.prototype.RemoveApp = function(app) {
+    var id = this.Apps.indexOf(app);
+
+    if (id > -1) {
+        this.Apps.splice(id, 1);
+
+        this.AppCount--;
+    }
+
     return;
 }
 
@@ -73,21 +93,31 @@ LPApps.LoanerAccount.prototype.ShowPassword = function () {
 
 LPApps.LoanerAccount.prototype.GetCheckoutUserName = function () {
     var self = this;
+    var oldName = this.CheckoutUserName;
 
-    var user = LPAccounts.GetAccount(this.CheckoutUser, function(data) {
-        if (data.Data != null) {
-            var account = LPAccounts.InitializeAccount(data.Data);
+    if (this.CheckoutUser > 0) {
+        var user = LPAccounts.GetAccount(this.CheckoutUser, function (data) {
+            if (data.Data != null) {
+                var account = LPAccounts.InitializeAccount(data.Data);
 
-            LPAccounts.AddAccount(account);
+                LPAccounts.AddAccount(account);
 
-            self.CheckoutUserName = account.DisplayName;
+                self.CheckoutUserName = account.DisplayName;
 
-            self.OnUpdate.Invoke(this, null);
+                if(oldName != self.CheckoutUserName)
+                    self.OnUpdate.Invoke(this, null);
+            }
+        });
+
+        if (user != null) {
+            this.CheckoutUserName = user.DisplayName;
+
+            if (oldName != self.CheckoutUserName)
+                this.OnUpdate.Invoke(this, null);
         }
-    });
-
-    if (user != null) {
-        this.CheckoutUserName = user.DisplayName;
+    }
+    else {
+        this.CheckoutUserName = "N/A";
     }
 
     return;

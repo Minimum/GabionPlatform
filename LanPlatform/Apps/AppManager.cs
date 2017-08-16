@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using GabionPlatform.Accounts;
 using GabionPlatform.DAL;
 using GabionPlatform.Models;
@@ -38,7 +37,12 @@ namespace GabionPlatform.Apps
             // Load apps
             foreach (LoanerAccount account in accounts)
             {
-                account.Apps = Context.LoanerApp.Where(s => s.Account == account.Id).ToList();
+                account.Apps =
+                    Context.App.Where(
+                        app =>
+                            Context.LoanerApp.Where(loanerApp => loanerApp.Account == account.Id)
+                                .Select(loanerApp => loanerApp.App)
+                                .Contains(app.Id)).ToList();
             }
 
             return accounts;
@@ -51,7 +55,12 @@ namespace GabionPlatform.Apps
             // Load apps
             if (account != null)
             {
-                account.Apps = Context.LoanerApp.Where(s => s.Account == account.Id).ToList();
+                account.Apps =
+                    Context.App.Where(
+                        app =>
+                            Context.LoanerApp.Where(loanerApp => loanerApp.Account == account.Id)
+                                .Select(loanerApp => loanerApp.App)
+                                .Contains(app.Id)).ToList();
             }
 
             return account;
@@ -66,7 +75,12 @@ namespace GabionPlatform.Apps
             // Load apps
             if (account != null)
             {
-                account.Apps = Context.LoanerApp.Where(s => s.Account == account.Id).ToList();
+                account.Apps =
+                    Context.App.Where(
+                        app =>
+                            Context.LoanerApp.Where(loanerApp => loanerApp.Account == account.Id)
+                                .Select(loanerApp => loanerApp.App)
+                                .Contains(app.Id)).ToList();
             }
 
             return account;
@@ -84,9 +98,52 @@ namespace GabionPlatform.Apps
             return;
         }
 
+        public LoanerApp GetLoanerApp(LoanerAccount account, long appId)
+        {
+            return GetLoanerApp(account.Id, appId);
+        }
+
+        public LoanerApp GetLoanerApp(long accountId, long appId)
+        {
+            return Context.LoanerApp.FirstOrDefault(s => s.Account == accountId && s.App == appId);
+        }
+
+        public void AddLoanerApp(LoanerApp app)
+        {
+            Context.LoanerApp.Add(app);
+
+            return;
+        }
+
+        public void RemoveLoanerApp(LoanerApp app)
+        {
+            Context.LoanerApp.Remove(app);
+
+            return;
+        }
+
+        public App GetAppById(long id)
+        {
+            return Context.App.FirstOrDefault(s => s.Id == id);
+        }
+
         public List<App> GetApps()
         {
             return Context.App.Where(s => s.Id > 0).ToList();
+        }
+
+        public void AddApp(App app)
+        {
+            Context.App.Add(app);
+
+            return;
+        }
+
+        public void RemoveApp(App app)
+        {
+            Context.App.Remove(app);
+
+            return;
         }
     }
 }

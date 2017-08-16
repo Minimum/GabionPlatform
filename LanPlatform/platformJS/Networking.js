@@ -5,13 +5,18 @@ var LPNet = {};
 
 LPNet.MessageTypes = [];
 
-//LPNet.RESPONSE_OUTOFDATE = -2;
-//LPNet.RESPONSE_INVALID = -1;
-LPNet.RESPONSE_HANDLED = 0;
-LPNet.RESPONSE_ERROR = 1;
-LPNet.RESPONSE_NOT_INSTALLED = 2;
-LPNet.RESPONSE_DISABLED = 3;
-LPNet.RESPONSE_APPERROR = 4;
+LPNet.AppResponseType =
+{
+    AppTypeMismatch: -3,
+    AppVersionMismatch: -2,
+    ResponseInvalid: -1,
+    ResponseHandled: 0,
+    ResponseError: 1,
+    AppNotInstalled: 2,
+    AppDisabled: 3,
+    AppError: 4,
+    AccessDenied: 5
+}
 
 LPNet.Initialize = function () {
 
@@ -33,7 +38,7 @@ LPNet.AppResponse = function (data) {
             response = data.AppResponse;
         }
         else {
-            response = LPNet.RESPONSE_OUTOFDATE;
+            response = LPNet.AppResponseType.AppVersionMismatch;
         }
     }
     else {

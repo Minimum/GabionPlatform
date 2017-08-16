@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web;
 using System.Web.Http;
 using GabionPlatform.Accounts;
+using GabionPlatform.DTO.News;
 using GabionPlatform.Models;
 using GabionPlatform.Models.Requests;
 using GabionPlatform.Network;
@@ -90,7 +92,7 @@ namespace GabionPlatform.Controllers
 
             if (status != null)
             {
-                instance.Data = new NewsStatusModel(status);
+                instance.Data = new NewsStatusDto(status);
             }
             else
             {
@@ -128,7 +130,7 @@ namespace GabionPlatform.Controllers
                             NetMessageManager.AddMessageBroadcastQuick(instance, new NewsStatusChangeMessage(id));
                         }
 
-                        instance.Data = status;
+                        instance.Data = new NewsStatusDto(status);
                     }
                     else
                     {
@@ -171,7 +173,7 @@ namespace GabionPlatform.Controllers
                     // Add and save status to DB
                     newsManager.AddStatus(status);
 
-                    instance.Data = status;
+                    instance.Data = new NewsStatusDto(status);
                 }
                 else
                 {
@@ -197,7 +199,9 @@ namespace GabionPlatform.Controllers
 
             page = page < 1 ? 1 : page;
 
-            instance.Data = new BrowseResult<NewsStatus>(newsManager.GetStatusList(page, 50), newsManager.GetStatusCount());
+            List<NewsStatusDto> status = NewsStatusDto.ConvertList(newsManager.GetStatusList(page, 50));
+
+            instance.Data = new BrowseResult<NewsStatusDto>(status, newsManager.GetStatusCount());
 
             return instance.ToResponse();
         }

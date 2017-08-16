@@ -90,10 +90,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\TestDatabase.mdf" />
-    <Content Include="App_Data\TestDatabase_log.ldf">
-      <DependentUpon>TestDatabase.mdf</DependentUpon>
-    </Content>
     <Content Include="css\bootstrap.min.css" />
     <Content Include="css\font-awesome.min.css" />
     <Content Include="css\lanplatform.css" />
@@ -116,6 +112,7 @@
     <Content Include="platformJS\Accounts\UserAccount.js" />
     <Content Include="platformJS\Angular.js" />
     <Content Include="platformJS\Apps.js" />
+    <Content Include="platformJS\Apps\App.js" />
     <Content Include="platformJS\Apps\LoanerAccount.js" />
     <Content Include="platformJS\Content.js" />
     <Content Include="platformJS\Content\ContentAccess.js" />
@@ -149,7 +146,12 @@
     <Content Include="platformJS\Views\Content\UploadFile.js" />
     <Content Include="platformJS\Views\Header.js" />
     <Content Include="platformJS\Views\Home\Home.js" />
-    <Content Include="platformJS\Views\Library\Games.js" />
+    <Content Include="platformJS\Views\Library\Apps\AppView.js" />
+    <Content Include="platformJS\Views\Library\Apps\CreateAppModal.js" />
+    <Content Include="platformJS\Views\Library\Apps\DeleteAppModal.js" />
+    <Content Include="platformJS\Views\Library\Apps\EditAppModal.js" />
+    <Content Include="platformJS\Views\Library\Content\EditContentModal.js" />
+    <Content Include="platformJS\Views\Library\AppList.js" />
     <Content Include="platformJS\Views\Library\LoanerList.js" />
     <Content Include="platformJS\Networking.js" />
     <Content Include="platformJS\News.js" />
@@ -160,8 +162,11 @@
     <Content Include="platformJS\Views\Account\AccountView\AwardGroup.js" />
     <Content Include="platformJS\Views\Community\PlayerList.js" />
     <Content Include="platformJS\News\WeatherStatus.js" />
+    <Content Include="platformJS\Views\Library\Loaners\AddAppModal.js" />
+    <Content Include="platformJS\Views\Library\Loaners\CheckinModal.js" />
     <Content Include="platformJS\Views\Library\Loaners\CheckoutModal.js" />
     <Content Include="platformJS\Views\Library\Loaners\LoanerView.js" />
+    <Content Include="platformJS\Views\Library\Loaners\RemoveAppModal.js" />
     <Content Include="platformJS\Views\Library\Main.js" />
     <Content Include="scripts\angular-mocks.js" />
     <Content Include="scripts\angular-resource.min.js" />
@@ -220,14 +225,15 @@
     <Content Include="views\content\uploadfile.html" />
     <Content Include="views\global\accessdenied.html" />
     <Content Include="views\home\main.html" />
-    <Content Include="views\library\apps.html" />
     <Content Include="views\library\downloads.html" />
-    <Content Include="views\library\games.html" />
+    <Content Include="views\library\apps.html" />
     <Content Include="views\library\loaners.html" />
+    <Content Include="views\library\loaners\addapp.html" />
+    <Content Include="views\library\loaners\checkin.html" />
     <Content Include="views\library\loaners\checkout.html" />
+    <Content Include="views\library\loaners\removeapp.html" />
     <Content Include="views\library\loaners\view.html" />
     <Content Include="views\library\main.html" />
-    <Content Include="views\library\mods.html" />
     <Content Include="views\music\main.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -243,6 +249,7 @@
     <Compile Include="Accounts\UserRole.cs" />
     <Compile Include="Accounts\UserRoleAccess.cs" />
     <Compile Include="Apps\App.cs" />
+    <Compile Include="Apps\AppEditRecord.cs" />
     <Compile Include="Apps\LoanerCheckoutRecord.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Auth\AuthAttempt.cs" />
@@ -259,12 +266,11 @@
     <Compile Include="Content\ContentItem.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AppController.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\EventController.cs" />
-    <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Controllers\InstallController.cs" />
     <Compile Include="Controllers\LightingController.cs" />
-    <Compile Include="Controllers\LoanerController.cs" />
     <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\MusicController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
@@ -275,7 +281,17 @@
     <Compile Include="DAL\PlatformContext.cs" />
     <Compile Include="Database\DatabaseObject.cs" />
     <Compile Include="Database\EditableDatabaseObject.cs" />
+    <Compile Include="DTO\Accounts\AuthSessionDto.cs" />
+    <Compile Include="DTO\Accounts\AuthUsernameDto.cs" />
+    <Compile Include="DTO\Accounts\UserPermissionDto.cs" />
+    <Compile Include="DTO\Accounts\UserRoleDto.cs" />
     <Compile Include="DTO\Accounts\UserAccountDto.cs" />
+    <Compile Include="DTO\Apps\AppDto.cs" />
+    <Compile Include="DTO\Apps\LoanerAccountDto.cs" />
+    <Compile Include="DTO\Content\ContentItemDto.cs" />
+    <Compile Include="DTO\EditableGabionDto.cs" />
+    <Compile Include="DTO\GabionDto.cs" />
+    <Compile Include="DTO\News\NewsStatusDto.cs" />
     <Compile Include="Engine\EngineUtil.cs" />
     <Compile Include="Events\LanEvent.cs" />
     <Compile Include="Events\LanEventGuest.cs" />
@@ -289,21 +305,20 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Accounts\UserAccount.cs" />
-    <Compile Include="GOnline\Character.cs" />
-    <Compile Include="GOnline\CharacterPreset.cs" />
-    <Compile Include="GOnline\CharacterSkin.cs" />
+    <Compile Include="GOnline\Characters\Character.cs" />
+    <Compile Include="GOnline\Characters\CharacterPreset.cs" />
+    <Compile Include="GOnline\Characters\CharacterSkin.cs" />
     <Compile Include="GOnline\Color.cs" />
     <Compile Include="Apps\AppManager.cs" />
     <Compile Include="Apps\LoanerAccount.cs" />
     <Compile Include="Apps\LoanerApp.cs" />
+    <Compile Include="GOnline\Properties\Property.cs" />
+    <Compile Include="GOnline\Properties\PropertyAccess.cs" />
+    <Compile Include="GOnline\Properties\PropertyOwner.cs" />
     <Compile Include="Lighting\Light.cs" />
     <Compile Include="Lighting\LightGroup.cs" />
     <Compile Include="Lighting\LightingManager.cs" />
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AppInstance.cs" />
-    <Compile Include="Models\AuthUsernameModel.cs" />
-    <Compile Include="Models\ContentItemModel.cs" />
-    <Compile Include="Models\NewsStatusModel.cs" />
     <Compile Include="Models\Requests\AddUsernameRequest.cs" />
     <Compile Include="Models\Requests\ChangeNewsStatusRequest.cs" />
     <Compile Include="Models\Requests\EditAccountRequest.cs" />
@@ -370,7 +385,6 @@
   <ItemGroup>
     <Folder Include="App_Data\ContentStatic\" />
     <Folder Include="App_Data\Content\" />
-    <Folder Include="DAO\" />
     <Folder Include="pages\community\" />
     <Folder Include="pages\global\" />
     <Folder Include="pages\home\" />

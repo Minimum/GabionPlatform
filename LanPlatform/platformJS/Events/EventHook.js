@@ -1,6 +1,5 @@
-﻿LPEvents.EventHook = function(handler, handleId, callback) {
+﻿LPEvents.EventHook = function(handler, callback) {
     this.Handler = handler;
-    this.HandleId = handleId;
     this.Callback = callback;
 }
 

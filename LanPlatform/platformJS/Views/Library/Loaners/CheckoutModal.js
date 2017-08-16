@@ -1,16 +1,31 @@
 ﻿LPAngular.controller('ModalLoanerCheckout', function ($uibModalInstance, $scope, account) {
     $scope.RequestStatus = 0;
+    $scope.ErrorMessage = "";
     $scope.Account = account;
-    
 
-    $.post(LanPlatform.ApiPath + "loaners/checkout/" + account.Id, {}, null, "json");
+    $scope.FinishRequest = function (data) {
+        if (data != null) {
+            if (data.Status == LPNet.AppResponseType.ResponseHandled) {
+                $scope.RequestStatus = 1;
 
-    $scope.FinishLogin = function (data) {
-        if (LPAccounts.Auth(data)) {
-            $uibModalInstance.dismiss('finish');
+                $scope.Account.CheckoutUser = LPAccounts.LocalAccount.Id;
+
+                $scope.Account.OnUpdate.Invoke($scope, null);
+            }
+            else {
+                if (data.StatusCode == "CHECKOUT_LIMIT_HIT") {
+                    $scope.RequestStatus = -2;
+                }
+                else {
+                    $scope.RequestStatus = -1;
+
+                    $scope.ErrorMessage = data.StatusCode;
+                }
+            }
         }
         else {
-            $scope.RequestStatus = 2;
+            $scope.RequestStatus = -1;
+            $scope.ErrorMessage = "Server returned invalid response.";
         }
     }
 
@@ -21,4 +36,6 @@
     $scope.Cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
+
+    $.post(LanPlatform.ApiPath + "apps/loaner/" + account.Id + "/checkout", {}, $scope.FinishRequest, "json");
 });

@@ -47,6 +47,10 @@
         return;
     }
 
+    if (LPAccounts.LocalAccount != null) {
+        $scope.UpdateLocalAccount($scope, LPAccounts.LocalAccount);
+    }
+
     LPAccounts.OnLocalAccountChange.AddHook($scope.UpdateLocalAccount);
 
     LPInterface.NavProfile = $scope;

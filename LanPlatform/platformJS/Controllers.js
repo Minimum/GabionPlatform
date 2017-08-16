@@ -28,9 +28,9 @@
                     templateUrl: 'views/library/loaners.html',
                     controller: "RouteLibraryLoaners"
                 }).
-                    when('/library/guests/view/:guestId', {
-                        templateUrl: 'views/library/guests/view.html',
-                        controller: "RouteLibraryGuestsView"
+                    when('/library/loaner/:accountId', {
+                        templateUrl: 'views/library/loaners/view.html',
+                        controller: "RouteLibraryLoanerView"
                     }).
                 when('/library/downloads', {
                     templateUrl: 'views/library/downloads.html',
